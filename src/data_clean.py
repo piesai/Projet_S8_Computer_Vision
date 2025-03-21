@@ -6,7 +6,7 @@ import random as rd
 import numpy as np
 dataset = torchvision.datasets.GTSRB(root = '/home/pierres/Projet_S8/data/',
                            download=True,
-                           transform = v2.Compose([v2.PILToTensor(),v2.Resize(size = (200,200))])) #quel padding mettre sachant que la plus grosse image va jusqu'à 243
+                           transform = v2.Compose([v2.Resize(size = (200,200)),v2.ToTensor(),v2.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))]))
 
 
 batch_size = 16
