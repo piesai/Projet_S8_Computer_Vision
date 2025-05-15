@@ -1,9 +1,12 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from data_clean import trainloader,trainloader_test
+from data_clean import trainloader, trainloader_test
 import torch
-import matplotlib.pyplot as plt
 import numpy as np
+
+# Check if CUDA is available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 class Net(nn.Module):
     def __init__(self):
@@ -12,8 +15,8 @@ class Net(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.fc1 = nn.Linear(35344, 512)
-        self.fc2 = nn.Linear(512, 126)
-        self.fc3 = nn.Linear(126, 43)
+        self.fc2 = nn.Linear(512, 1096) 
+        self.fc3 = nn.Linear(1096, 9)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -24,7 +27,7 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-net = Net().cuda()
+net = Net().to(device)  # Move the model to the GPU
 
 import torch.optim as optim
 
@@ -35,7 +38,7 @@ for epoch in range(4):
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         inputs, labels = data
-        inputs, labels = inputs.cuda(), labels.cuda()
+        inputs, labels = inputs.to(device), labels.to(device)  # Move data to the GPU
         optimizer.zero_grad()
         outputs = net(inputs)
         loss = criterion(outputs, labels)
@@ -50,7 +53,7 @@ print('Finished Training')
 
 dataiter = iter(trainloader)
 images, labels = next(dataiter)
-images, labels = images.cuda(), labels.cuda()
+images, labels = images.to(device), labels.to(device)  # Move data to the GPU
 print(labels)
 outputs = net(images)
 outputs = outputs.detach().cpu().numpy()
@@ -61,7 +64,7 @@ total = 0
 with torch.no_grad():
     for data in trainloader_test:
         images, labels = data
-        images, labels = images.cuda(), labels.cuda()
+        images, labels = images.to(device), labels.to(device)  # Move data to the GPU
         outputs = net(images)
         _, predicted = torch.max(outputs, 1)
         total += labels.size(0)
