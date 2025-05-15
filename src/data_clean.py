@@ -45,4 +45,3 @@ trainloader_test = torch.utils.data.DataLoader(data_train, batch_size=16, shuffl
 #plt.imshow(images[0].permute(1, 2, 0).cpu())
 #print(labels.cpu())
 #plt.show()  
-
